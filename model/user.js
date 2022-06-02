@@ -25,4 +25,14 @@ export default class User {
     return result;
   }
 
+  static async login ({ login, password }) {
+    const conn = await client.connect(),
+          db = conn.db(),
+          result = await db.collection('user')
+                           .findOne({ login, password: md5(password) },
+                                    { projection: { password: 0 } });
+    conn.close();
+    return result;
+  }
+
 }

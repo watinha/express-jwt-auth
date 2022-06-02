@@ -6,26 +6,56 @@
   </head>
   <body>
     <h1>JWT Based login</h1>
-    <fieldset>
+    <fieldset id="new_user">
       <legend>new user</legend>
       <input type="text" name="login" value="">
       <input type="password" name="password" value="">
       <input type="submit" name="add" value="add">
     </fieldset>
+
+    <fieldset id="login">
+      <legend>login</legend>
+      <input type="text" name="login" value="">
+      <input type="password" name="password" value="">
+      <input type="submit" name="add" value="add">
+    </fieldset>
     <script type="text/javascript" charset="utf-8">
-      const login = document.querySelector('[name=login]'),
-            password = document.querySelector('[name=password]'),
-            submit = document.querySelector('[type=submit]');
+      (() => {
+        const login = document.querySelector('#new_user [name=login]'),
+              password = document.querySelector('#new_user [name=password]'),
+              submit = document.querySelector('#new_user [type=submit]');
 
-      submit.addEventListener('click', async () => {
-        const response = await fetch('./user', {
-          method: 'POST',
-          headers: { 'Content-type': 'application/json' },
-          body: JSON.stringify({ login: login.value, password: password.value })
-        }).then((res) => res.json());
+        submit.addEventListener('click', async () => {
+          const token = localStorage.getItem('token'),
+                response = await fetch('./user', {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ login: login.value, password: password.value })
+          }).then((res) => res.json());
 
-        console.log(response);
-      });
+          console.log(response);
+        });
+      })();
+
+      (() => {
+        const login = document.querySelector('#login [name=login]'),
+              password = document.querySelector('#login [name=password]'),
+              submit = document.querySelector('#login [type=submit]');
+
+        submit.addEventListener('click', async () => {
+          const { token } = await fetch('./login', {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify({ login: login.value, password: password.value })
+          }).then((res) => res.json());
+
+          console.log(token);
+          localStorage.setItem('token', token);
+        });
+      })();
     </script>
   </body>
 </html>
